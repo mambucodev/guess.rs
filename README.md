@@ -6,7 +6,7 @@ This is a simple guessing game implemented in Rust.
 
 1. Clone the repository:
   ```
-  git clone https://github.com/mambuco/guessing-game.rs.git
+  git clone https://github.com/mambucodev/guessing-game.rs.git
   ```
 
 2. Navigate to the project directory:
