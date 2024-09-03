@@ -1,3 +1,4 @@
+use std::cmp::Ordering;
 use rand::Rng;
 use std::io;
 
@@ -15,11 +16,13 @@ fn main() {
         let parsed_guess = guess.trim().parse::<i32>();
         match parsed_guess {
             Ok(n) => {
-                if index == n {
-                    println!("You win!");
-                    break 'outer;
-                } else {
-                    println!("Wrong. Try again.");
+                match n.cmp(&index) {
+                    Ordering::Less => println!("Go higher..."),
+                    Ordering::Greater => println!("Go lower..."),
+                    Ordering::Equal => {
+                        println!("You won! It was {}.", n);
+                        break 'outer;
+                    }
                 }
             }
             Err(err) => {
