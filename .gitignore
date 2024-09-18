@@ -1,1 +1,8 @@
+## Cargo ##
 /target
+
+## IntelliJ IDEA ##
+.idea/
+
+## Visual Studio Code ##
+.vscode/
