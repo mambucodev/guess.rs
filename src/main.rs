@@ -3,6 +3,7 @@ use std::cmp::Ordering;
 use colored::*;
 use rand::Rng;
 
+// Clear the console screen
 fn clear() {
     print!("\x1B[2J\x1B[1;1H");
 }
@@ -10,49 +11,87 @@ fn clear() {
 fn main() {
     clear();
 
-    let maximum = 20;
+    let mut maximum = 20;
+    let mut lives = 3;
+    let mut level = 1;
 
-    let index = rand::thread_rng().gen_range(1..=maximum);
+    // Display game instructions
+    println!("{}", "Welcome to the Number Guessing Game!".green().bold());
+    println!("Instructions:");
+    println!("1. Guess a number within the given range.");
+    println!("2. You have 3 lives to start with.");
+    println!("3. Each correct guess advances you to the next level.");
+    println!("4. The range increases by 10 for each level.");
+    println!("5. Type 'exit' at any time to quit the game.");
+    println!();
 
-    println!("{}", format!("Guess a number from {} to {}!", "1".yellow().bold(), maximum.to_string().yellow().bold()).green());
+    loop {
+        println!("{}", format!("Level {}: Guess a number from {} to {}!", level, "1".yellow().bold(), maximum.to_string().yellow().bold()).green());
+        println!("{}", format!("Lives remaining: {}", "❤".repeat(lives)).red());
 
-    'outer: loop {
-        let mut guess = String::new();
-        
-        print!("{} ", ">".cyan().bold());
-        io::stdout().flush().expect("Failed to flush stdout.");
+        let index = rand::thread_rng().gen_range(1..=maximum);
 
-        io::stdin()
-            .read_line(&mut guess)
-            .expect("Failed to read line.");
+        'inner: loop {
+            let mut guess = String::new();
 
-        if guess.trim().to_lowercase() == "exit" {
-            println!("{}", "You're weren't even made for guessing games after all...".red().bold());
-            break 'outer;
-        }
+            print!("{} ", ">".cyan().bold());
+            io::stdout().flush().expect("Failed to flush stdout.");
 
-        let parsed_guess = guess.trim().parse::<i32>();
-        match parsed_guess {
-            Ok(n) => {
-                if n > maximum {
-                    println!("{}\n{}", format!("Why are you guessing a number higher than {maximum}...").red(), "Who do you think you are?".red().bold());
-                    continue;
-                } else if n < 1 {
-                    println!("{}", "Don't worry, there's no negative numbers.".red());
-                    continue;
-                }
-                match n.cmp(&index) {
-                    Ordering::Less => println!("{}", "Go higher...".red().bold()),
-                    Ordering::Greater => println!("{}", "Go lower...".red().bold()),
-                    Ordering::Equal => {
-                        println!("{} It was {}.", "You won!".green().bold(), n.to_string().yellow().bold());
-                        break 'outer;
+            io::stdin()
+                .read_line(&mut guess)
+                .expect("Failed to read line.");
+
+            if guess.trim().to_lowercase() == "exit" {
+                println!("{}", "Game over. Thanks for playing!".red().bold());
+                return;
+            }
+
+            let parsed_guess = guess.trim().parse::<u32>();
+            match parsed_guess {
+                Ok(n) => {
+                    if n > maximum {
+                        println!("{}", format!("Please guess a number between 1 and {maximum}.").red());
+                        continue;
+                    }
+                    match n.cmp(&index) {
+                        Ordering::Less => {
+                            println!("{}", "Too low! Try a higher number.".red().bold());
+                            lives -= 1;
+                        },
+                        Ordering::Greater => {
+                            println!("{}", "Too high! Try a lower number.".red().bold());
+                            lives -= 1;
+                        },
+                        Ordering::Equal => {
+                            println!("{} It was {}.", "Correct!".green().bold(), n.to_string().yellow().bold());
+                            level += 1;
+                            maximum += 10;
+                            lives += 1;
+                            println!("{}", format!("You've advanced to level {} and gained an extra life!", level).yellow().italic());
+                            break 'inner;
+                        }
                     }
                 }
+                Err(e) => {
+                    match e.kind() {
+                        std::num::IntErrorKind::PosOverflow => {
+                            println!("{}", format!("Number too large. Please enter a number below {}.", u32::MAX).red());
+                        },
+                        _ => {
+                            println!("{}", "Invalid input. Please enter a valid number.".red().bold());
+                        }
+                    }
+                }
+            };
+
+            if lives == 0 {
+                println!("{}", format!("Game Over! You made it to level {}.", level).red().bold());
+                return;
             }
-            Err(_) => {
-                println!("{}", format!("Seems like that wasn't a number after all...\nUnless it was higher than {}.", "2,147,483,647".yellow().bold()).red());
-            }
-        };
+
+            println!("{}", format!("Lives remaining: {}", "❤".repeat(lives)).red());
+        }
+
+        clear();
     }
 }
