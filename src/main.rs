@@ -11,15 +11,15 @@ fn clear() {
 fn main() {
     clear();
 
-    let mut maximum = 20;
-    let mut lives = 3;
-    let mut level = 1;
+    let mut maximum: usize = 20;
+    let mut lives: usize = 5;
+    let mut level: usize = 1;
 
     // Display game instructions
     println!("{}", "Welcome to the Number Guessing Game!".green().bold());
     println!("Instructions:");
     println!("1. Guess a number within the given range.");
-    println!("2. You have 3 lives to start with.");
+    println!("2. You have {lives} lives to start with.");
     println!("3. Each correct guess advances you to the next level.");
     println!("4. The range increases by 10 for each level.");
     println!("5. Type 'exit' at any time to quit the game.");
@@ -49,11 +49,11 @@ fn main() {
             let parsed_guess = guess.trim().parse::<u32>();
             match parsed_guess {
                 Ok(n) => {
-                    if n > maximum {
+                    if (n as usize) > maximum {
                         println!("{}", format!("Please guess a number between 1 and {maximum}.").red());
                         continue;
                     }
-                    match n.cmp(&index) {
+                    match (n as usize).cmp(&index) {
                         Ordering::Less => {
                             println!("{}", "Too low! Try a higher number.".red().bold());
                             lives -= 1;
@@ -66,7 +66,7 @@ fn main() {
                             println!("{} It was {}.", "Correct!".green().bold(), n.to_string().yellow().bold());
                             level += 1;
                             maximum += 10;
-                            lives += 1;
+                            lives += (level as f32 / 2.0).round() as usize;
                             println!("{}", format!("You've advanced to level {} and gained an extra life!", level).yellow().italic());
                             break 'inner;
                         }
