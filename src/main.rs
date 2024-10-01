@@ -85,7 +85,7 @@ fn main() {
             };
 
             if lives == 0 {
-                println!("{}", format!("Game Over! You made it to level {}.", level).red().bold());
+                println!("{}", format!("Game Over, it was {index}! You made it to level {}.", level).red().bold());
                 return;
             }
 
